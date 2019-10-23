@@ -144,9 +144,8 @@ fi
 
 #command_output=$(eval "$1" &>> "$OUTPUT")
 #command_output=$(eval "$1" 2>&1 | tee -a "$OUTPUT")
-command_output=$(eval $1)
+command_output="$(eval $1 2>&1)"
 echo "$command_output" >> "$OUTPUT"
-
 
 retval=$?
 if (( "$VERBOSE_FLAG" == $TRUE )); then
@@ -188,15 +187,29 @@ function update_brew()
         echo -e "    ${Blue}[i]${NC} No outdated packages"
     else
         echo -en "    ${Blue}[i]${NC} "
-        for package in "$command_output"; do
-            echo -ne "${White}$package${NC} "
+        for package in $command_output; do
+            echo -en "${White}$package${NC} "
         done
         echo
-        for package in "$command_output"; do
+        for package in $command_output; do
             run_command "brew upgrade $package" "Upgrading $package"
         done
     fi
-    run_command 'brew doctor'   'Brew Doctor'
+    run_command 'brew cask outdated' 'Determining outdated cask packages:'
+#    command_output="$command_output" | tr "\n" " "
+    if [ -z "$command_output" ]; then
+        echo -e "    ${Blue}[i]${NC} No outdated cask packages"
+    else
+        echo -en "    ${Blue}[i]${NC} "
+        for package in $command_output; do
+            echo -en "${White}${package}${NC} "
+        done
+        echo
+        for package in $command_output; do
+            run_command "brew cask upgrade $package" "Upgrading $package"
+        done
+    fi
+    run_command 'brew doctor' 'Brew Doctor'
 }
 
 #------------[ Update MacOS ]--------------------------------------------------
@@ -232,12 +245,12 @@ function update_pip2()
         echo -e "    ${Blue}[i]${NC} No outdated packages found"
     else
         echo -en "    ${Blue}[i]${NC} "
-        for package in "$command_output"; do
-            echo -ne "${White}$package${NC} "
+        for package in $command_output; do
+            echo -en "${White}$package${NC} "
         done
         echo
-        for package in "$command_output"; do
-            run_command "$PIP install --upgrade $package 2> /dev/null" "Upgrading $pip_package"
+        for package in $command_output; do
+            run_command "$PIP install --upgrade $package 2> /dev/null" "Upgrading $package"
         done
     fi
 }
@@ -254,18 +267,18 @@ function update_pip3()
     fi
 
     command_output=""
-    run_command "$PIP list --outdated 2> /dev/null | tail -n+3 | awk '{print \$1}'" "Determining pip2 outdated packages"
+    run_command "$PIP list --outdated 2> /dev/null | tail -n+3 | awk '{print \$1}'" "Determining pip3 outdated packages"
 
     if [ -z "$command_output" ]; then
         echo -e "    ${Blue}[i]${NC} No outdated packages found"
     else
         echo -en "    ${Blue}[i]${NC} "
-        for package in "$command_output"; do
-            echo -ne "${White}$package${NC} "
+        for package in $command_output; do
+            echo -en "${White}$package${NC} "
         done
         echo
-        for package in "$command_output"; do
-            run_command "$PIP install --upgrade $package" "Upgrading $pip_package"
+        for package in $command_output; do
+            run_command "$PIP install --upgrade $package" "Upgrading $package"
         done
     fi
 
