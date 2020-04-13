@@ -222,8 +222,11 @@ function update_macos()
     else
         echo -e "${BBlue}[I]${NC} ${White}MacOS, starting update${NC}"
     fi
-    echo -e "    ${Red}[I]${NC} MacOS update coming soon"
-    #"$UPDATER" -l
+#    echo -e "    ${Red}[I]${NC} MacOS update coming soon"
+#    "$UPDATER" --list
+    run_command "$UPDATER --list" "Finding available updates (This can take a while)"
+    echo -e "    ${Blue}[i]${NC} $command_output"
+
 }
 
 
@@ -235,7 +238,7 @@ function update_pip2()
     if (( "$VERBOSE_FLAG" == $TRUE || "$BANNER_FLAG" == $TRUE )); then
         pip2_banner
     else
-        echo -e "${BBlue}[I]${NC} ${White}pip2, starting update${NC}"
+        echo -e "${BBlue}[I]${NC} ${White}pip2, ${Red}python2 has been deprecated${NC}"
     fi
 
     command_output=""
