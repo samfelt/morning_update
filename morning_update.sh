@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
 #------------[ Sources ]-------------------------------------------------------
+SOURCE_DIR=$(dirname $(readlink $BASH_SOURCE))
 SOURCES=( colors.sh \
           banners.sh )
 
 for f in ${SOURCES[@]}; do
-    [ -f $f ] && . $f
+    ff=$SOURCE_DIR/$f
+    [ -f $ff ] && . $ff
 done
 
 #------------[ True/False ]----------------------------------------------------
